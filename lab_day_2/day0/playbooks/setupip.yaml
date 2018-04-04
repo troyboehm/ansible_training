@@ -1,0 +1,31 @@
+---
+
+- name: Create selfip
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create Self IP vlan10
+      bigip_selfip:
+        vlan:  "{{ day1.vlan10_name }}"
+        address: "{{ day1ltm.selfip_vlan10 }}"
+        netmask: "{{ day1ltm.netmask }}"
+        name: "{{ day1ltm.selfip_vlan10 }}"
+        allow_service: "{{  day1ltm.portlockdown }}"
+
+    - name: Create Self IP vlan10
+      bigip_selfip:
+        address: "{{ day1ltm.selfip_vlan20 }}"
+        netmask: "{{ day1ltm.netmask }}"
+        name: "{{ day1ltm.selfip_vlan20 }}"
+        vlan: "{{ day1.vlan20_name }}"
+        allow_service: "{{ day1ltm.portlockdown }}"
+
+

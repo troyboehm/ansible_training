@@ -1,0 +1,20 @@
+---
+
+- name: An example node playbook
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Create a Node
+      bigip_node:
+        address: 10.1.20.11
+        name: node1
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        user: "{{ username }}"
+        validate_certs: "{{ validate_certs }}"

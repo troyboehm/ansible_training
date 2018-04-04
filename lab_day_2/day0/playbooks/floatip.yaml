@@ -1,0 +1,31 @@
+---
+
+- name: Create floating IP
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+  - name: Create floating IP Vlan 10
+    bigip_selfip:
+      address: "{{ day1.floatip_vlan10 }}" 
+      name: float_vlan10
+      netmask: "{{ day1ltm.netmask }}"
+      vlan: "{{ day1.vlan10_name }}"
+      traffic_group: traffic_group_2
+    run_once: true
+
+  - name: Create floating IP Vlan 20
+    bigip_selfip:
+      address: "{{ day1.floatip_vlan20 }}"
+      name: float_vlan20
+      netmask: "{{ day1ltm.netmask }}"
+      vlan: "{{ day1.vlan20_name }}"
+      traffic_group: traffic_group_2
+    run_once: true

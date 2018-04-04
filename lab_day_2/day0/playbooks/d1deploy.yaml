@@ -1,0 +1,93 @@
+---
+
+- name: Create Vlans
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create Vlan 10
+      bigip_vlan:
+        name: "{{ day1.vlan10_name }}" 
+        untagged_interfaces: "{{ day1.vlan10_int }}" 
+      tags: vlan10
+    - name: Create Vlan 20
+      bigip_vlan:
+        name: "{{ day1.vlan20_name }}"
+        untagged_interfaces: "{{ day1.vlan20_int }}"
+      tags: vlan20
+
+    - name: Create Self IP vlan10
+      bigip_selfip:
+        vlan:  "{{ day1.vlan10_name }}"
+        address: "{{ day1ltm.selfip_vlan10 }}"
+        netmask: "{{ day1ltm.netmask }}"
+        name: "{{ day1ltm.selfip_vlan10 }}"
+        allow_service: "{{  day1ltm.portlockdown }}"
+      tags: selfipvaln10
+
+    - name: Create Self IP vlan10
+      bigip_selfip:
+        address: "{{ day1ltm.selfip_vlan20 }}"
+        netmask: "{{ day1ltm.netmask }}"
+        name: "{{ day1ltm.selfip_vlan20 }}"
+        vlan: "{{ day1.vlan20_name }}"
+        allow_service: "{{ day1ltm.portlockdown }}"
+      tags: selfipvlan20
+
+    - name: Configure device connectivity for standard HA pair
+      bigip_device_connectivity:
+        config_sync_ip: "{{ day1ltm.selfip_vlan10 }}"
+        mirror_primary_address: "{{ day1ltm.selfip_vlan10 }}"
+        unicast_failover:
+          - address: "{{ ansible_host }}"
+          - address: "{{ day1ltm.selfip_vlan10 }}"
+      tags: devicecon
+
+    - name: Add trusts for all peer devices to Active device
+      bigip_device_trust:
+        peer_server: "{{ peer_management }}"
+        peer_hostname: "{{ peer_hostname }}"
+        peer_user: "{{ peer_admin }}"
+        peer_password: "{{ peer_password }}"
+      run_once: true
+      tags: devicetrust
+
+    - name: Create a sync-only device group
+      bigip_device_group:
+        name: "{{ day1.sync_fail_name }}"
+        type: "{{ day1.type }}"
+      run_once: true
+      tags: synconly
+
+    - name: Add the current device to the "{{ day1.sync_fail_name }}" device group
+      bigip_device_group_member:
+        name: "{{hostname }}.localdomain"
+        device_group: "{{ day1.sync_fail_name }}"
+      run_once: true
+      tags: addlocaldevice
+
+    - name: Add the remote device to the "{{ day1.sync_fail_name }}" device group
+      bigip_device_group_member:
+        name: "{{ peer_hostname }}"
+        device_group: "{{ day1.sync_fail_name }}"
+      run_once: true
+      tags: addremotedevce
+
+    - name: Create a traffic group
+      bigip_traffic_group:
+        name: traffic_group_2 
+      tags: createtraffic
+
+    - name: Sync configuration from device to group using "{{ day1.sync_fail_name }}"
+      bigip_configsync_action:
+        device_group: "{{ day1.sync_fail_name }}"
+        sync_most_recent_to_device: yes
+      run_once: true
+      tags: triggersync1                                       

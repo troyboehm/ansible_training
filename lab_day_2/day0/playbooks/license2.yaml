@@ -1,0 +1,17 @@
+---
+
+- name: Restoration the BIGIPs to default with just management IP
+  hosts: canwipe
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: License BIG-IP using a key
+      bigip_raw:
+        commands: SOAPLicenseClient --basekey "A3911-07359-78209-46716-0140789"

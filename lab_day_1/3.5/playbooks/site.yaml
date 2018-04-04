@@ -1,0 +1,45 @@
+---
+
+- name: An example step through playbook
+  hosts: bigip
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: admin
+    F5_PASSWORD: admin
+    F5_SERVER_PORT: 443
+    F5_VALIDATE_CERTS: no
+
+  vars:
+    send_string1: "GET /hr\r\n"
+    monitor_name: "monitor2"
+
+  tasks:
+    - name: Create HTTP Monitor
+      bigip_monitor_http:
+        name: "{{ monitor_name }}"
+        send: "{{ send_string1 }}"
+      register: result
+
+    - name: Assert Create HTTP Monitor
+      assert:
+        that:
+          - result is changed
+          - result.send == send_string1
+
+    - name: Create HTTP Monitor - Idempotent check
+      bigip_monitor_http:
+        name: "{{ monitor_name }}"
+        send: "{{ send_string1 }}"
+      register: result
+
+    - name: Assert Create HTTP Monitor - Idempotent check
+      assert:
+        that:
+          - result is not changed
+    - name: Remove HTTP Monitor
+      bigip_monitor_http:
+        name: "{{ monitor_name }}"
+        state: absent
+      register: result

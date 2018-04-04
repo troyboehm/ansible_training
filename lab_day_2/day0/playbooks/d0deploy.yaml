@@ -1,0 +1,103 @@
+---
+
+- name: Day 0 deploy LTM with management IP only
+  hosts: ltm
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  vars_prompt:
+    - name: rootpass
+      prompt: "Enter a new root password"
+      default: "default"
+
+  tasks:
+    - name: Disable the initial setup screen
+      bigip_sys_db:
+        key: setup.run
+        value: 'false'
+      tags: inital
+
+    - name: Save the running configuration of the BIG-IP
+      bigip_config:
+        save: yes
+      tags: save
+
+    - name: License BIG-IP using a key
+      bigip_raw:
+        commands: SOAPLicenseClient --basekey "A3911-07359-78209-46716-0140789"
+
+    - name: Provision LTM at "nominal" level
+      bigip_provision:
+        module: ltm
+      tags: provision
+
+#    - name: Install (upload, install) base image. Create volume if not exists
+#      bigip_software:
+#        software: "https://downloads.f5.com/esd/serveDownload.jsp?path=/big-ip/big-ip_v13.x/13.1.0/english/13.1.0.3/&sw=BIG-IP&pro=big-ip_v13.x&ver=13.1.0&container=13.1.0.3&file=BIGIP-13.1.0.3-0.0.5.iso"
+#        software_md5sum: "https://downloads.f5.com/esd/serveDownload.jsp?path=/big-ip/big-ip_v13.x/13.1.0/english/13.1.0.3/&sw=BIG-IP&pro=big-ip_v13.x&ver=13.1.0&container=13.1.0.3&file=BIGIP-13.1.0.3-0.0.5.iso.md5"
+#        volume: HD1.2
+#        state: installed
+
+    - name: Set NTP server
+      bigip_device_ntp:
+        ntp_servers:
+          - "{{ ntp1 }}"
+          - "{{ ntp2 }}"
+      tags: ntp
+
+    - name: Set timezone
+      bigip_device_ntp:
+        timezone: "{{ timezone }}"
+      tags: timezone
+
+    - name: Set the DNS settings on the BIG-IP
+      bigip_device_dns:
+        name_servers:
+          - "{{ dns1 }}"
+          - "{{ dns2 }}"
+      tags: dns
+
+    - name: Set the banner for the SSHD service from a file
+      bigip_device_sshd:
+        allow: "{{ access }}"
+        banner: "{{ banner }}"
+        banner_text: "{{ banner_text }}"
+      tags: banner
+
+    - name: Set the hostname
+      bigip_hostname:
+        hostname: " {{hostname }}.localdomain"
+      tags: hostname
+
+    - name: create a user
+      bigip_user:
+        username_credential: SuperNetOps
+        password_credential: password
+        partition_access: Common:operator
+        update_password: on_create
+        state: present
+        shell: none
+      tags: createuser
+
+    - name: Set httpd setting
+      bigip_device_httpd:
+        auth_pam_idle_timeout: 120000
+      tags: httpd
+
+    - name: Change the root user's password
+      bigip_user:
+        username_credential: root
+        password_credential: "{{ rootpass }}"
+        state: present
+      tags: rootpass
+ 
+    - name: Save the running configuration of the BIG-IP
+      bigip_config:
+        save: yes
+      tags: savefinal

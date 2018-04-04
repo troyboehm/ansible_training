@@ -1,0 +1,25 @@
+---
+# Set DNS Servers
+
+
+dns1: 172.24.1.241
+dns2: 172.24.1.242
+
+#SSHD setting
+access: "all"
+banner: "enabled"
+banner_text: "{{ lookup('file', 'bannertext') }}"
+
+#Vlan setup
+day1:
+  vlan10_name: vlan10
+  vlan10_int: 1.1
+  vlan20_name: vlan20
+  vlan20_int: 1.2
+  floatip_vlan10: 10.10.100.1 
+  floatip_vlan20: 20.20.100.1
+#  configsync:
+#    -  sync_fail_name: sync-fail
+#    -  type: sync-failover io
+  sync_fail_name: sync-fail
+  type: sync-failover 

@@ -1,0 +1,17 @@
+---
+#Set Host name for ansible host 1
+hostname: troybLTM2
+
+#Set self `ip
+
+day1ltm:
+  selfip_vlan10: 10.10.100.3
+  selfip_vlan20: 20.20.100.3
+  netmask: 255.255.0.0     
+  portlockdown: all     
+
+
+peer_management: 10.154.131.183
+peer_hostname: troybLTM1.localdomain 
+peer_admin: admin
+peer_password: admin                   

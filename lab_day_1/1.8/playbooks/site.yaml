@@ -1,0 +1,10 @@
+---
+
+- name: An example copy playbook
+  hosts: server
+
+  tasks:
+    - name: Copy a local file to the remote system
+      copy:
+        src: ../files/sample-download.txt
+        dest: /var/www/html/sample-download.txt

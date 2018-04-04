@@ -1,0 +1,17 @@
+---
+
+- name: An example command playbook
+  hosts: bigip
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: admin
+    F5_PASSWORD: admin
+    F5_SERVER_PORT: 443
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create a datagroup using tmsh
+      bigip_command:
+        commands: "create /ltm data-group internal applicationIdRealm type string records add { epc.foo.bar.org { data 16777264 } }"

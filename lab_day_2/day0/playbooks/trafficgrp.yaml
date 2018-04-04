@@ -1,0 +1,18 @@
+---
+
+- name: Create device trust 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+  - name: Create a traffic group
+    bigip_traffic_group:
+      name: traffic_group_2 
+

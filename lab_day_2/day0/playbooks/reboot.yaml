@@ -1,0 +1,33 @@
+---
+ 
+- name: Reboot and wait
+  hosts: ltm
+  connection: local
+  gather_facts: no
+ 
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+ 
+ 
+  tasks:
+    - name: Reboot BIG-IP
+      bigip_command:
+        commands: tmsh reboot
+        user: "{{ username }}"
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"
+      ignore_errors: true
+ 
+    - name: Wait for shutdown to happen
+      pause:
+        seconds: 90
+ 
+    - name: Wait for BIG-IP to actually be ready
+      bigip_wait:
+        user: "{{ username }}"
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"

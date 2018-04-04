@@ -1,0 +1,28 @@
+---
+
+- name: An example add nodes to a pool
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Remove LTM
+      bigip_provision:
+        module: ltm
+        state: absent
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"
+        user: "{{ username }}"
+
+    - name: Provision APM
+      bigip_provision:
+        module: apm
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"
+        user: "{{ username }}"

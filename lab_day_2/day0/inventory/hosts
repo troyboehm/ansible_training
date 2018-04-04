@@ -1,0 +1,21 @@
+server ansible_host=10.154.131.185
+bigip ansible_host=10.154.131.184
+client ansible_host=10.154.131.185
+
+[ltm]
+ltm1 ansible_host=10.154.131.183
+ltm2 ansible_host=10.154.131.187
+
+[canwipe]
+ltm1 ansible_host=10.154.131.183
+ltm2 ansible_host=10.154.131.187
+
+[ltm:vars]
+ntp1=192.168.11.168
+ntp2=pool.ntp.org 
+timezone=America/Los_Angeles
+
+[private]
+bigip1 ansible_host=10.154.131.179
+bigip2 ansible_host=10.154.131.180
+standalone ansible_host=10.154.131.181

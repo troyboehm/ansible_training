@@ -1,0 +1,31 @@
+---
+
+- name: Create device trust 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create a sync-only device group
+      bigip_device_group:
+        name: "{{ day1.sync_fail_name }}"
+        type: "{{ day1.type }}"
+      run_once: true
+
+    - name: Add the current device to the "{{ day1.sync_fail_name }}" device group
+      bigip_device_group_member:
+        name: "{{hostname }}.localdomain"
+        device_group: "{{ day1.sync_fail_name }}"
+      run_once: true
+
+    - name: Add the remote device to the "{{ day1.sync_fail_name }}" device group
+      bigip_device_group_member:
+        name: "{{ peer_hostname }}"
+        device_group: "{{ day1.sync_fail_name }}"
+      run_once: true

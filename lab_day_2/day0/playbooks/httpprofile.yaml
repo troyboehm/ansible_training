@@ -1,0 +1,19 @@
+---
+
+- name: Create http profile 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+
+  tasks:
+    - name: Create http profile on LTM
+      bigip_command:
+        commands: 'create ltm profile http customHTTP response-chunking unchunk header-insert "Accept-Encoding: gzip,deflate"'
+      run_once: true

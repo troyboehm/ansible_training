@@ -1,0 +1,10 @@
+---
+ 
+- name: An example template playbook
+  hosts: server
+ 
+  tasks:
+    - name: Template a file to disk
+      template:
+        src: ../templates/sample-template.txt
+        dest: /tmp/sample-template.txt

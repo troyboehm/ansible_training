@@ -1,0 +1,20 @@
+---
+
+- name: An example copy playbook
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Create many pools
+      bigip_pool:
+        name: web-servers
+        lb_method: ratio-member
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        user: "{{ username }}"
+        validate_certs: "{{ validate_certs }}"

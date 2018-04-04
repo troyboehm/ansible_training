@@ -1,0 +1,26 @@
+---
+
+- name: Create Vlans
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create Vlan 10
+      bigip_vlan:
+        name: "{{ day1.vlan10_name }}" 
+        untagged_interfaces: "{{ day1.vlan10_int }}" 
+
+    - name: Create Vlan 20
+      bigip_vlan:
+        name: "{{ day1.vlan20_name }}"
+        untagged_interfaces: "{{ day1.vlan20_int }}"
+
+
+

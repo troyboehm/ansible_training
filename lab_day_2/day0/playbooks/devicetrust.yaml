@@ -1,0 +1,29 @@
+---
+
+- name: Create device trust 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Add trusts for all peer devices to Active device
+      bigip_device_trust:
+        peer_server: "{{ peer_management }}"
+        peer_hostname: "{{ peer_hostname }}"
+        peer_user: "{{ peer_admin }}"
+        peer_password: "{{ peer_password }}"
+      run_once: true
+
+
+
+
+
+
+
+

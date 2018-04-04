@@ -1,0 +1,19 @@
+---
+
+- name: create remote Role 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Create Remote Role
+      bigip_command:
+       commands:  modify auth remote-role role-info add {  adm { attribute F5-LTM-User-Info-1=adm line-order 1 role administrator user-partition all console tmsh } }  
+      run_once: true
+

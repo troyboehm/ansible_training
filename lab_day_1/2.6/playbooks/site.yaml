@@ -1,0 +1,20 @@
+---
+
+- name: Add the iApp
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Add the iApp
+      bigip_iapp_template:
+        content: "{{ lookup('file', '../files/appsvcs_integration_v2.0.004.tmpl') }}"
+        state: present
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        user: "{{ username }}"
+        validate_certs: "{{ validate_certs }}"

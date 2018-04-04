@@ -1,0 +1,20 @@
+---
+
+- name: Create a Partition
+  hosts: bigip
+  connection: local
+  gather_facts: no
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Create partition
+      bigip_partition:
+        name: my-partition
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"
+        user: "{{ username }}"

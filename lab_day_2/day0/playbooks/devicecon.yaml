@@ -1,0 +1,24 @@
+---
+
+- name: Create selfip
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Configure device connectivity for standard HA pair
+      bigip_device_connectivity:
+        config_sync_ip: "{{ day1ltm.selfip_vlan10 }}"
+        mirror_primary_address: "{{ day1ltm.selfip_vlan10 }}"
+        unicast_failover:
+          - address: "{{ ansible_host }}"
+          - address: "{{ day1ltm.selfip_vlan10 }}"
+
+
+

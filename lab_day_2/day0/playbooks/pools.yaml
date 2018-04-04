@@ -1,0 +1,28 @@
+---
+
+- name: Create 10 pools 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+
+  tasks:
+    - name: Create 10 pools
+      bigip_pool:
+        name: "pool{{ item }}"
+      with_sequence: start=1 end=10 stride=1   
+      run_once: true
+
+    - name: Add pool member
+      bigip_pool_member:
+        pool: "pool{{ item }}"
+        host: "node{{ item }}"
+        port: 80
+      with_sequence: start=1 end=10 stride=1
+      run_once: true

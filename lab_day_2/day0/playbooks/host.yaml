@@ -1,0 +1,17 @@
+---
+
+- name: Set the hostname
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Set the hostname
+      bigip_hostname:
+        hostname: " {{hostname }}.localdomain"

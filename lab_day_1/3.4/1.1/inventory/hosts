@@ -1,0 +1,3 @@
+server ansible_host=10.154.131.185 ssh_connection=local
+bigip ansible_host=10.154.131.184
+client ansible_host=10.154.131.185 ssh_connection=local

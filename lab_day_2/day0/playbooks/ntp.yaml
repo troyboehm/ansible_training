@@ -1,0 +1,23 @@
+---
+
+- name: Restoration the BIGIPs to default with just management IP
+  hosts: ltm
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Set NTP server
+      bigip_device_ntp:
+        ntp_servers:
+          - "{{ ntp1 }}" 
+          - "{{ ntp2 }}"
+
+    - name: Set timezone
+      bigip_device_ntp:
+        timezone: "{{ timezone }}"

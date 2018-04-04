@@ -1,0 +1,26 @@
+---
+
+- name: An example add nodes to a pool
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter BIG-IP username"
+      private: yes
+    - name: "password"
+      prompt: "Enter BIG-IP password"
+      private: yes
+
+  tasks:
+    - name: Create web servers pool
+      bigip_pool:
+        name: web-servers-2
+        lb_method: ratio-member
+        password: "{{ password }}"
+        user: "{{ username }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"

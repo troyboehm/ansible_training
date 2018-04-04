@@ -1,0 +1,14 @@
+---
+
+- name: An example prompting playbook
+  hosts: server
+
+  vars_prompt:
+    - name: partition
+      prompt: "Enter a partition name"
+      default: "Common"
+
+  tasks:
+    - name: Print out your input
+      debug:
+        msg: "You provided the {{ partition }} partition for the 'partition' prompt"

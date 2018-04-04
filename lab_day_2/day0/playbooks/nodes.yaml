@@ -1,0 +1,21 @@
+---
+
+- name: Create 10 nodes 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+
+  tasks:
+    - name: Add 10 node
+      bigip_node:
+        name: "node{{ item }}"
+        host: "20.20.100.{{ item|int +10 }}" 
+      with_sequence: start=1 count=10  
+      run_once: true

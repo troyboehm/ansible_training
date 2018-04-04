@@ -1,0 +1,116 @@
+---
+
+- name: Day 2 setup
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: create Tacacs system auth
+      bigip_command:
+       commands: create auth tacacs system-auth { servers add { 10.154.131.185 } service ppp protocol ip secret testing123 }
+      run_once: true
+      tags: tacacs
+
+    - name: Create Remote Role
+      bigip_command:
+       commands:  modify auth remote-role role-info add {  adm { attribute F5-LTM-User-Info-1=adm line-order 1 role administrator user-partition all console tmsh } }
+      run_once: true
+      tags: remoterole
+
+    - name: set Tacacs as default Auth Type
+      bigip_command:
+       commands:  modify auth source type tacacs
+      run_once: true
+      tags: authtype
+
+    - name: Create floating IP Vlan 10
+      bigip_selfip:
+        address: "{{ day1.floatip_vlan10 }}"
+        name: float_vlan10
+        netmask: "{{ day1ltm.netmask }}"
+        vlan: "{{ day1.vlan10_name }}"
+        traffic_group: traffic_group_2
+      run_once: true
+      tags: floatingip
+
+    - name: Create floating IP Vlan 20
+      bigip_selfip:
+        address: "{{ day1.floatip_vlan20 }}"
+        name: float_vlan20
+        netmask: "{{ day1ltm.netmask }}"
+        vlan: "{{ day1.vlan20_name }}"
+        traffic_group: traffic_group_2
+      run_once: true
+      tags: floatingip
+                           
+    - name: Create iRule in LTM
+      bigip_irule:
+        content: "{{ lookup('template', 'httpredirect.tcl') }}"
+        module: ltm
+        name: httpredirect
+      run_once: true
+      tags: irule
+
+    - name: Create http profile on LTM
+      bigip_command:
+        commands: 'create ltm profile http customHTTP response-chunking unchunk header-insert "Accept-Encoding: gzip,deflate"'
+      run_once: true
+      tags: httpprofile
+
+    - name: Add 10 node
+      bigip_node:
+        name: "node{{ item }}"
+        host: "20.20.100.{{ item|int +10 }}"
+      with_sequence: start=1 count=10
+      run_once: true
+      tags: nodes
+
+    - name: Create 10 pools
+      bigip_pool:
+        name: "pool{{ item }}"
+      with_sequence: start=1 end=10 stride=1
+      run_once: true
+      tags: pools
+
+    - name: Add pool member
+      bigip_pool_member:
+        pool: "pool{{ item }}"
+        host: "node{{ item }}"
+        port: 80
+      with_sequence: start=1 end=10 stride=1
+      run_once: true
+      tags: poolmember
+
+    - name: Add 10 virtual server
+      bigip_virtual_server:
+        name: "vip{{ item }}"
+        destination: "10.10.100.{{ item|int + 10 }}"
+        port: 80
+        pool: "pool{{ item }}"
+        snat: Automap
+        description: "Virtual Server vip{{ item }}"
+        profiles:
+          - http
+      with_sequence: start=1 count=10
+      run_once: true
+      tags: virtualserver 
+
+    - name: Save the running configuration of the BIG-IP
+      bigip_config:
+        save: yes
+      tags: saved3final
+  
+    - name: Sync configuration from device to group using "{{ day1.sync_fail_name }}"
+      bigip_configsync_action:
+        device_group: "{{ day1.sync_fail_name }}"
+        sync_device_to_group: yes
+      run_once: true
+      tags: finalsync
+                           

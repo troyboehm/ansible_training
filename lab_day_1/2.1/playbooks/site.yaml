@@ -1,0 +1,15 @@
+---
+
+- name: An example pool playbook
+  hosts: bigip
+  connection: local
+
+  tasks:
+    - name: Create web servers pool
+      bigip_pool:
+        name: web-servers
+        lb_method: ratio-member
+        password: admin
+        server: "{{ ansible_host }}"
+        user: admin
+        validate_certs: no

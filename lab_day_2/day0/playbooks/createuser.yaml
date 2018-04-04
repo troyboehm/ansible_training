@@ -1,0 +1,22 @@
+---
+
+- name: create a user
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: create a user
+      bigip_user:
+        username_credential: SuperNetOps
+        password_credential: password
+        partition_access: Common:operator
+        update_password: on_create
+        state: present
+        shell: none

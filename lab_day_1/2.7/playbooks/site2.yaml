@@ -1,0 +1,22 @@
+---
+
+- name: An example add nodes to a pool
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: Add the iApp Service
+      bigip_iapp_service:
+        name: http-iapp1-v3
+        template: f5.http.v1.2.0rc4
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"
+        state: present
+        user: "{{ username }}"
+        parameters: "{{ lookup('file', '../files/http-iapp-parameters.json') }}"

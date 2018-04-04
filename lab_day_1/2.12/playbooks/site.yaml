@@ -1,0 +1,20 @@
+---
+
+- name: Save sys config
+  hosts: bigip
+  connection: local
+  gather_facts: no
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name: saving config
+      bigip_config:
+        save: yes
+        user: "{{ username }}"
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        validate_certs: "{{ validate_certs }}"

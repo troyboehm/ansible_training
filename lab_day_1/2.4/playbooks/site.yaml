@@ -1,0 +1,23 @@
+---
+
+- name: An example add nodes to a pool
+  hosts: bigip
+  connection: local
+
+  vars:
+    validate_certs: no
+    username: admin
+    password: admin
+
+  tasks:
+    - name:  add Node to pool
+      bigip_pool_member:
+        description: webserver-1
+        address: 10.1.20.11
+        name: node1
+        pool: web-servers
+        port: 80
+        password: "{{ password }}"
+        server: "{{ ansible_host }}"
+        user: "{{ username }}"
+        validate_certs: "{{ validate_certs }}"

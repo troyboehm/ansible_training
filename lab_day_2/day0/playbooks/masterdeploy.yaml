@@ -1,0 +1,4 @@
+---
+- import_playbook: d0deploy.yaml
+- import_playbook: d1deploy.yaml
+- import_playbook: d2deploy.yaml

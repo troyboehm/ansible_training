@@ -1,0 +1,9 @@
+---
+  - name: An example install playbook
+    hosts: server
+
+    tasks:
+      - name: Install apache
+        apt:
+          name: tree
+          update_cache: yes

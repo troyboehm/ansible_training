@@ -1,0 +1,22 @@
+---
+
+- name: Restoration the BIGIPs to default with just management IP
+  hosts: ltm
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Disable the initial setup screen
+      bigip_sys_db:
+        key: setup.run
+        value: 'false'
+
+    - name: Save the running configuration of the BIG-IP
+      bigip_config:
+        save: yes

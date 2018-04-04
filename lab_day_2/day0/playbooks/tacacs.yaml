@@ -1,0 +1,19 @@
+---
+
+- name: create Tacac auth 
+  hosts: ltm 
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: run show version on remote devices
+      bigip_command:
+       commands: create auth tacacs system-auth { servers add { 10.154.131.185 } service ppp protocol ip secret testing123 }  
+      run_once: true
+

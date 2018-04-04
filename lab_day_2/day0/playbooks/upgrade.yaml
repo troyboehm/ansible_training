@@ -1,0 +1,20 @@
+---
+
+- name: Restoration the BIGIPs to default with just management IP
+  hosts: ltm
+  gather_facts: no
+  connection: local
+
+  environment:
+    F5_SERVER: "{{ ansible_host }}"
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_VALIDATE_CERTS: no
+
+  tasks:
+    - name: Install (upload, install) base image. Create volume if not exists
+      bigip_software:
+        software: "https://downloads.f5.com/esd/serveDownload.jsp?path=/big-ip/big-ip_v13.x/13.1.0/english/13.1.0.3/&sw=BIG-IP&pro=big-ip_v13.x&ver=13.1.0&container=13.1.0.3&file=BIGIP-13.1.0.3-0.0.5.iso"
+        software_md5sum: "https://downloads.f5.com/esd/serveDownload.jsp?path=/big-ip/big-ip_v13.x/13.1.0/english/13.1.0.3/&sw=BIG-IP&pro=big-ip_v13.x&ver=13.1.0&container=13.1.0.3&file=BIGIP-13.1.0.3-0.0.5.iso.md5"
+        volume: HD1.2
+        state: installed
